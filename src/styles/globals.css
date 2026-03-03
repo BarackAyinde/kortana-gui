@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* ─── Colour tokens ────────────────────────────────────────────────────────── */
 :root {
   --bg-void:        #050508;
   --bg-base:        #0a0a14;
@@ -17,6 +18,7 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
+/* ─── Reset ────────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -29,9 +31,44 @@ html, body, #root {
   overflow: hidden;
 }
 
+/* ─── Base typography ──────────────────────────────────────────────────────── */
 body {
   background-color: var(--bg-void);
   color: var(--text-primary);
   font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* All text elements inherit monospace — no exceptions (plan rule) */
+input, textarea, button, select, code, pre {
+  font-family: var(--font-mono);
+  font-size: inherit;
+}
+
+/* ─── Text selection ────────────────────────────────────────────────────────── */
+::selection {
+  background: var(--accent-blue);
+  color: var(--bg-void);
+}
+
+/* ─── Scrollbars ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-bright);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-ghost);
 }
