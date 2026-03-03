@@ -1,5 +1,6 @@
 import { useUIStore } from '../store/uiStore'
 import MessageList from './MessageList'
+import MessageInput from './MessageInput'
 
 export default function ChatSidebar() {
   const sidebarOpen = useUIStore((s) => s.sidebarOpen)
@@ -11,7 +12,7 @@ export default function ChatSidebar() {
           <span className="chat-sidebar__title">CHAT</span>
         </div>
         <MessageList />
-        {/* Input mounts here in S-06 */}
+        <MessageInput />
       </div>
     </aside>
   )
