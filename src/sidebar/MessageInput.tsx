@@ -1,12 +1,23 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useChatStore } from '../store/chatStore'
 import { streamMessage, buildSystemPrompt } from '../lib/kortanaApi'
+import { getContextSnapshot } from '../lib/contextCache'
 import type { ApiMessage } from '../lib/kortanaApi'
 
 export default function MessageInput() {
   const [value, setValue] = useState('')
+  const [nodeCount, setNodeCount] = useState<number | null>(null)
+  const [contextOffline, setContextOffline] = useState(false)
   const { messages, addMessage, appendToLast, setStreaming, isStreaming } = useChatStore()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // Fetch context on mount to populate the badge
+  useEffect(() => {
+    getContextSnapshot().then((snap) => {
+      setNodeCount(snap.nodeCount)
+      setContextOffline(snap.error !== null)
+    })
+  }, [])
 
   const canSend = value.trim().length > 0 && !isStreaming
 
@@ -23,12 +34,17 @@ export default function MessageInput() {
     addMessage({ role: 'assistant', content: '' })
     setStreaming(true)
 
-    // 3. Build history for the API (all messages + the new user one)
+    // 3. Fetch context (30s cache) and build system prompt
+    const snap = await getContextSnapshot()
+    setNodeCount(snap.nodeCount)
+    setContextOffline(snap.error !== null)
+    const systemPrompt = buildSystemPrompt(snap.markdown, snap.nodeCount)
+
+    // 4. Build message history for the API
     const history: ApiMessage[] = [
       ...messages.map((m) => ({ role: m.role, content: m.content })),
       { role: 'user', content },
     ]
-    const systemPrompt = buildSystemPrompt() // S-08 will inject context here
 
     await streamMessage(history, systemPrompt, {
       onChunk: (chunk) => appendToLast(chunk),
@@ -56,7 +72,15 @@ export default function MessageInput() {
   }
 
   return (
-    <div className="msg-input">
+    <div className="msg-input-wrap">
+      <div className="msg-input-meta">
+        {contextOffline ? (
+          <span className="msg-input-meta__offline">context offline</span>
+        ) : nodeCount !== null ? (
+          <span className="msg-input-meta__badge">context: {nodeCount} nodes</span>
+        ) : null}
+      </div>
+      <div className="msg-input">
       <textarea
         ref={textareaRef}
         className="msg-input__textarea"
@@ -84,6 +108,7 @@ export default function MessageInput() {
           ↵
         </button>
       )}
+      </div>
     </div>
   )
 }

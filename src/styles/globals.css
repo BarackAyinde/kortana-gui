@@ -325,13 +325,39 @@ input, textarea, button, select, code, pre {
 }
 
 /* ─── Message input ──────────────────────────────────────────────────────────── */
-.msg-input {
+.msg-input-wrap {
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+}
+
+.msg-input-meta {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.msg-input-meta__badge {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--text-ghost);
+  text-transform: uppercase;
+}
+
+.msg-input-meta__offline {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--accent-amber);
+  text-transform: uppercase;
+}
+
+.msg-input {
   display: flex;
   align-items: flex-end;
   gap: 6px;
-  padding: 10px 12px;
-  border-top: 1px solid var(--border);
+  padding: 6px 12px 10px;
   background: var(--bg-surface);
 }
 
