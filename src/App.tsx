@@ -5,6 +5,7 @@ import DashboardZone from './canvas/DashboardZone'
 import ChatSidebar from './sidebar/ChatSidebar'
 import CommandPalette from './ui/CommandPalette'
 import ModeTransition from './ui/ModeTransition'
+import RadarOverlay from './ui/RadarOverlay'
 import { useUIStore } from './store/uiStore'
 import { useWindowManagerStore } from './store/windowManagerStore'
 
@@ -35,6 +36,7 @@ export default function App() {
         <ChatSidebar />
       </div>
       {paletteOpen && <CommandPalette />}
+      <RadarOverlay />
       <ModeTransition />
     </div>
   )

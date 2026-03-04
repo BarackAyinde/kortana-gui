@@ -171,7 +171,13 @@ export const useWindowManagerStore = create<WindowManagerState>((set, get) => ({
 
   setActivePreset: (preset) => set({ activePreset: preset }),
 
-  applyLayoutDirective: (directive) => set({ currentLayout: directive, activePreset: null }),
+  applyLayoutDirective: (directive) =>
+    set((state) => ({
+      currentLayout: directive,
+      activePreset: null,
+      // Auto-switch to dashboard so the user sees the layout immediately
+      canvasMode: state.canvasMode === 'free' ? 'dashboard' : state.canvasMode,
+    })),
 }))
 
 // Persist canvas state to localStorage — debounced 500ms
