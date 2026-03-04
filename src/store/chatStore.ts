@@ -10,10 +10,12 @@ export interface Message {
 export interface ChatState {
   messages: Message[]
   isStreaming: boolean
+  systemPrompt: string
   addMessage: (msg: Pick<Message, 'role' | 'content'>) => void
   appendToLast: (chunk: string) => void
   patchLast: (content: string) => void
   setStreaming: (streaming: boolean) => void
+  setSystemPrompt: (prompt: string) => void
   clearMessages: () => void
 }
 
@@ -36,6 +38,7 @@ const SEED_MESSAGES: Message[] = [
 export const useChatStore = create<ChatState>((set) => ({
   messages: SEED_MESSAGES,
   isStreaming: false,
+  systemPrompt: '',
 
   addMessage: (msg) =>
     set((state) => ({
@@ -70,6 +73,8 @@ export const useChatStore = create<ChatState>((set) => ({
     }),
 
   setStreaming: (streaming) => set({ isStreaming: streaming }),
+
+  setSystemPrompt: (prompt) => set({ systemPrompt: prompt }),
 
   clearMessages: () => set({ messages: [] }),
 }))

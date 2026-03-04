@@ -24,10 +24,7 @@ export default function CanvasZone() {
   return (
     <div className="canvas-zone" style={{ position: 'relative' }}>
       {panels.length === 0 && (
-        <div className="canvas-zone__empty">
-          <span className="canvas-zone__hint">⌘K · spawn panel</span>
-          <span className="canvas-zone__hint">⌘⇧K · toggle dashboard/canvas</span>
-        </div>
+        <div className="canvas-zone__empty" />
       )}
 
       {panels.map((panel) => (
@@ -37,6 +34,11 @@ export default function CanvasZone() {
       ))}
 
       <ActivePanelsButton />
+
+      <div className="canvas-zone__keyhints">
+        <span>⌘K · spawn panel</span>
+        <span>⌘⇧K · dashboard</span>
+      </div>
     </div>
   )
 }

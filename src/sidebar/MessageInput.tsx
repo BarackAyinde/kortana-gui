@@ -12,7 +12,7 @@ export default function MessageInput() {
   const [value, setValue] = useState('')
   const [nodeCount, setNodeCount] = useState<number | null>(null)
   const [contextStatus, setContextStatus] = useState<ContextStatus>(null)
-  const { messages, addMessage, appendToLast, patchLast, setStreaming, isStreaming } = useChatStore()
+  const { messages, addMessage, appendToLast, patchLast, setStreaming, isStreaming, setSystemPrompt } = useChatStore()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Fetch context on mount to populate the badge
@@ -43,6 +43,7 @@ export default function MessageInput() {
     setNodeCount(snap.nodeCount)
     setContextStatus(snap.error ? 'offline' : snap.source)
     const systemPrompt = buildSystemPrompt(snap.markdown, snap.nodeCount)
+    setSystemPrompt(systemPrompt)
 
     // 4. Build message history for the API
     const history: ApiMessage[] = [
@@ -88,15 +89,18 @@ export default function MessageInput() {
     el.style.height = `${Math.min(el.scrollHeight, 120)}px`
   }
 
+  const isLive = contextStatus === 'api'
+  const isOffline = contextStatus === 'offline' || contextStatus === null
+
   return (
     <div className="msg-input-wrap">
       <div className="msg-input-meta">
-        {contextStatus === 'offline' ? (
-          <span className="msg-input-meta__offline">context offline</span>
+        {isOffline ? (
+          <span className="msg-input-meta__offline">◈ no context</span>
         ) : contextStatus === 'file' ? (
-          <span className="msg-input-meta__file">context file</span>
-        ) : nodeCount !== null ? (
-          <span className="msg-input-meta__badge">context: {nodeCount} nodes</span>
+          <span className="msg-input-meta__file">◈ context file</span>
+        ) : isLive ? (
+          <span className="msg-input-meta__live">◈ context injected{nodeCount !== null ? ` · ${nodeCount} nodes` : ''}</span>
         ) : null}
       </div>
       <div className="msg-input">
@@ -128,6 +132,7 @@ export default function MessageInput() {
           </button>
         )}
       </div>
+      <div className="msg-input__hint">↵ send&nbsp;&nbsp;&nbsp;⇧↵ newline</div>
     </div>
   )
 }

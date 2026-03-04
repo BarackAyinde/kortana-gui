@@ -3,23 +3,22 @@ import * as d3 from 'd3'
 import type { GraphNode, GraphEdge } from '../types'
 
 type View = 'list' | 'graph'
+type ContextStatus = 'live' | 'stale' | 'offline'
 
 const NODE_COLORS: Record<string, string> = {
-  Project:     '#00ffb3',
-  Session:     '#00c4ff',
-  Agent:       '#00c4ff',
-  Decision:    '#ffb300',
-  Requirement: '#e0e0f0',
-  Constraint:  '#ff4444',
-  Risk:        '#ff4444',
-  Question:    '#ffb300',
-  Component:   '#00ffb3',
-  Insight:     '#6060a0',
-  Person:      '#00ffb3',
-  Service:     '#00c4ff',
+  Goal:           'var(--accent-green)',
+  Intent:         'var(--accent-green)',
+  Requirement:    'var(--accent-blue)',
+  Decision:       'var(--accent-amber)',
+  Component:      '#9060ff',
+  Question:       'var(--accent-red)',
+  Implementation: '#6868a0',
+  Constraint:     'var(--accent-red)',
+  Risk:           'var(--accent-amber)',
 }
 
 const POLL_MS = 30_000
+const HEALTH_MS = 10_000
 const BASE_URL = 'http://localhost:4000'
 
 function fmtTime(d: Date): string {
@@ -255,6 +254,32 @@ function NodeDrawer({ node, onClose }: { node: GraphNode; onClose: () => void })
   )
 }
 
+// ─── StatusChip ──────────────────────────────────────────────────────────────
+
+function StatusChip({ status, nodeCount, fetchedAt }: {
+  status: ContextStatus
+  nodeCount: number
+  fetchedAt: Date | null
+}) {
+  if (status === 'live') {
+    return (
+      <span className="ctx-status ctx-status--live">
+        ● CONTEXT LIVE
+        {fetchedAt && ` · ${nodeCount} nodes · ${fmtTime(fetchedAt)}`}
+      </span>
+    )
+  }
+  if (status === 'stale') {
+    return (
+      <span className="ctx-status ctx-status--stale">
+        ● CONTEXT STALE
+        {nodeCount > 0 && ` · ${nodeCount} nodes`}
+      </span>
+    )
+  }
+  return <span className="ctx-status ctx-status--offline">● CONTEXT OFFLINE</span>
+}
+
 // ─── ContextPanel ────────────────────────────────────────────────────────────
 
 export default function ContextPanel() {
@@ -264,8 +289,30 @@ export default function ContextPanel() {
   const [fetchedAt, setFetchedAt] = useState<Date | null>(null)
   const [selected, setSelected] = useState<GraphNode | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [ctxStatus, setCtxStatus] = useState<ContextStatus>('offline')
+  const hasData = useRef(false)
 
+  // Health poller — every 10s
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/health`)
+        if (res.ok) {
+          setCtxStatus('live')
+        } else {
+          setCtxStatus(hasData.current ? 'stale' : 'offline')
+        }
+      } catch {
+        setCtxStatus(hasData.current ? 'stale' : 'offline')
+      }
+    }
+
+    checkHealth()
+    const id = setInterval(checkHealth, HEALTH_MS)
+    return () => clearInterval(id)
+  }, [])
+
+  // Data poller — every 30s
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -281,9 +328,9 @@ export default function ContextPanel() {
         setNodes(Array.isArray(nodesJson) ? nodesJson : (nodesJson.nodes ?? []))
         setEdges(Array.isArray(edgesJson) ? edgesJson : (edgesJson.edges ?? []))
         setFetchedAt(new Date())
-        setError(null)
-      } catch (e) {
-        setError(String(e))
+        hasData.current = true
+      } catch {
+        // health poller drives status; data errors don't override
       } finally {
         setLoading(false)
       }
@@ -312,15 +359,11 @@ export default function ContextPanel() {
             GRAPH
           </button>
         </div>
-        <span className="ctx-panel__fetch-time">
-          {loading && !fetchedAt
-            ? 'fetching…'
-            : error
-              ? 'offline'
-              : fetchedAt
-                ? `${nodes.length} nodes · ${fmtTime(fetchedAt)}`
-                : ''}
-        </span>
+        <StatusChip
+          status={loading && !fetchedAt ? 'offline' : ctxStatus}
+          nodeCount={nodes.length}
+          fetchedAt={fetchedAt}
+        />
       </div>
 
       {/* Main area */}

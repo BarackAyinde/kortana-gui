@@ -6,11 +6,11 @@
   --bg-base:        #0a0a14;
   --bg-surface:     #10101e;
   --bg-elevated:    #16162a;
-  --border:         #1e1e3a;
-  --border-bright:  #2a2a50;
-  --text-primary:   #e0e0f0;
-  --text-dim:       #6060a0;
-  --text-ghost:     #30305a;
+  --border:         #28284e;
+  --border-bright:  #3e3e70;
+  --text-primary:   #e8e8f8;
+  --text-dim:       #9898c8;
+  --text-ghost:     #6868a0;
   --accent-green:   #00ffb3;
   --accent-blue:    #00c4ff;
   --accent-amber:   #ffb300;
@@ -521,12 +521,23 @@ input, textarea, button, select, code, pre {
   animation: canvas-enter 300ms ease-out both;
 }
 
-.canvas-zone__hint {
-  font-size: 13px;
-  letter-spacing: 0.25em;
-  color: var(--text-dim);
-  opacity: 0.7;
+.canvas-zone__keyhints {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.canvas-zone__keyhints span {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--text-ghost);
   text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 @keyframes canvas-enter {
@@ -611,7 +622,7 @@ input, textarea, button, select, code, pre {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 8px;
   padding: 12px 0;
 }
 
@@ -619,7 +630,7 @@ input, textarea, button, select, code, pre {
 .msg {
   display: flex;
   flex-direction: column;
-  padding: 8px 16px;
+  padding: 10px 16px;
   animation: msg-enter 180ms ease-out;
 }
 
@@ -800,6 +811,108 @@ input, textarea, button, select, code, pre {
   0%, 100% { opacity: 0.2; }
   50%       { opacity: 1; }
 }
+
+/* ─── User label ─────────────────────────────────────────────────────────────── */
+.msg__user-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 3px;
+  text-align: right;
+}
+
+/* ─── Streaming cursor ───────────────────────────────────────────────────────── */
+.msg__cursor {
+  display: inline-block;
+  color: var(--accent-green);
+  animation: cursor-blink 0.9s step-end infinite;
+  margin-left: 1px;
+  font-size: 0.9em;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ─── Keyboard shortcut hint ─────────────────────────────────────────────────── */
+.msg-input__hint {
+  font-size: 9px;
+  color: var(--text-ghost);
+  letter-spacing: 0.05em;
+  padding: 3px 12px 5px;
+}
+
+/* ─── Context meta variants ──────────────────────────────────────────────────── */
+.msg-input-meta__live {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: #1a7a50;
+  text-transform: uppercase;
+}
+
+.msg-input-meta__file {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--accent-amber);
+  opacity: 0.6;
+  text-transform: uppercase;
+}
+
+/* ─── [SYSTEM] block ─────────────────────────────────────────────────────────── */
+.chat-system {
+  padding: 6px 16px 0;
+}
+
+.chat-system__toggle {
+  background: none;
+  border: none;
+  color: var(--text-ghost);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  transition: color 100ms ease;
+}
+
+.chat-system__toggle:hover {
+  color: var(--text-dim);
+}
+
+.chat-system__arrow {
+  font-size: 8px;
+}
+
+.chat-system__body {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  font-size: 9px;
+  line-height: 1.5;
+  color: var(--text-ghost);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* ─── Context status chip ────────────────────────────────────────────────────── */
+.ctx-status {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ctx-status--live   { color: var(--accent-green); }
+.ctx-status--stale  { color: var(--accent-amber); }
+.ctx-status--offline { color: var(--accent-red); }
 
 /* ─── ContextPanel ───────────────────────────────────────────────────────────── */
 .ctx-panel {
@@ -1188,6 +1301,260 @@ input, textarea, button, select, code, pre {
   color: var(--text-ghost);
   pointer-events: none;
   font-variant-numeric: tabular-nums;
+}
+
+/* ─── MapPanel: layer control ──────────────────────────────────────────────── */
+.map-layer-ctrl {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(10, 10, 20, 0.88);
+  border: 1px solid var(--text-ghost);
+  border-radius: 4px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 148px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  z-index: 10;
+}
+.map-layer-ctrl__title {
+  color: var(--accent-blue);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  margin-bottom: 2px;
+}
+.map-layer-ctrl__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+.map-layer-ctrl__row input[type="checkbox"] {
+  accent-color: var(--accent-blue);
+  cursor: pointer;
+}
+.map-layer-ctrl__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.map-layer-ctrl__dot--hollow {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1.5px solid var(--accent-amber);
+  background: transparent;
+}
+.map-layer-ctrl__count {
+  margin-left: auto;
+  color: var(--text-dim);
+  font-size: 9px;
+}
+.map-layer-ctrl__divider {
+  height: 1px;
+  background: var(--border-bright);
+  margin: 2px 0;
+}
+.map-layer-ctrl__time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-dim);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+.map-layer-ctrl__time select {
+  background: var(--bg-elevated);
+  border: 1px solid var(--text-ghost);
+  color: var(--text-primary);
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.map-layer-ctrl__status {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+.map-layer-ctrl__status--live   { color: var(--accent-green); }
+.map-layer-ctrl__status--offline { color: var(--text-ghost); }
+
+/* ─── MapPanel: legend ─────────────────────────────────────────────────────── */
+.map-legend {
+  position: absolute;
+  bottom: 22px;
+  right: 12px;
+  display: flex;
+  gap: 10px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.map-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.map-legend__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.map-legend__dot--hollow {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-amber);
+  background: transparent;
+}
+.map-popup__source--warn {
+  color: var(--accent-amber);
+}
+
+/* ─── MapPanel: story popup ────────────────────────────────────────────────── */
+.map-popup {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--accent-blue);
+  border-radius: 4px;
+  padding: 12px 14px;
+  min-width: 260px;
+  max-width: 340px;
+  z-index: 20;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+.map-popup__close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+}
+.map-popup__close:hover { color: var(--text-primary); }
+.map-popup__source {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--accent-blue);
+  margin-bottom: 4px;
+}
+.map-popup__title {
+  font-size: 12px;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.map-popup__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 10px;
+}
+.map-popup__location { color: var(--text-dim); }
+.map-popup__sev {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+.map-popup__link {
+  display: block;
+  font-size: 10px;
+  color: var(--accent-green);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+}
+.map-popup__link:hover { text-decoration: underline; }
+
+/* ── Story popup: header row (source + relative time) ─────────────────────── */
+.map-popup__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.map-popup__time {
+  font-size: 9px;
+  color: var(--text-ghost);
+  letter-spacing: 0.06em;
+}
+.map-popup__sources-badge {
+  font-size: 9px;
+  color: var(--accent-amber);
+  letter-spacing: 0.06em;
+  margin-left: auto;
+}
+
+/* ── Layer control: alert dot + count ────────────────────────────────────── */
+.map-layer-ctrl__dot--alert {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--accent-red);
+}
+.map-layer-ctrl__count--alert {
+  color: var(--accent-red);
+}
+
+/* ── Legend: alert pulse dot ────────────────────────────────────────────────── */
+.map-legend__dot--alert-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-red);
+}
+
+/* ── Alert ring markers (MapLibre Marker DOM nodes) ───────────────────────── */
+@keyframes alert-pulse {
+  0%   { transform: scale(1);   opacity: 0.9; }
+  70%  { transform: scale(2.4); opacity: 0.0; }
+  100% { transform: scale(2.4); opacity: 0.0; }
+}
+.alert-ring {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  pointer-events: none;
+  position: relative;
+}
+.alert-ring::before,
+.alert-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--accent-red);
+  animation: alert-pulse 1.8s ease-out infinite;
+}
+.alert-ring::after {
+  animation-delay: 0.9s;
+}
+.alert-ring--surge {
+  --accent-red: #ff4444;
+}
+.alert-ring--surge::before,
+.alert-ring--surge::after {
+  border-color: #ff4444;
+}
+.alert-ring--spike::before,
+.alert-ring--spike::after {
+  border-color: #ffb300;
 }
 
 /* ─── LogPanel ────────────────────────────────────────────────────────────────── */
@@ -1745,7 +2112,8 @@ input, textarea, button, select, code, pre {
 
 /* ─── Radar overlay (thinking/streaming indicator) ──────────────────────────── */
 @keyframes radar-pulse {
-  0%   { transform: translate(-50%, -50%) scale(0.2); opacity: 0.7; }
+  0%   { transform: translate(-50%, -50%) scale(0.2); opacity: 0;   }
+  15%  { transform: translate(-50%, -50%) scale(0.8); opacity: 0.7; }
   100% { transform: translate(-50%, -50%) scale(4);   opacity: 0;   }
 }
 
@@ -1791,7 +2159,9 @@ input, textarea, button, select, code, pre {
   height: 60px;
   border: 1px solid var(--accent-green);
   border-radius: 50%;
+  opacity: 0;
   animation: radar-pulse 2.4s linear infinite;
+  animation-fill-mode: backwards;
 }
 .radar-ring--1 { animation-delay: 0s;    }
 .radar-ring--2 { animation-delay: 0.8s;  }
