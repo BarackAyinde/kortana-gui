@@ -150,6 +150,9 @@ input, textarea, button, select, code, pre {
   border-color: var(--accent-blue);
 }
 
+.badge--clickable { cursor: pointer; user-select: none; }
+.badge--clickable:hover { opacity: 0.75; }
+
 /* ─── Status dot ─────────────────────────────────────────────────────────────── */
 .status-dot {
   width: 7px;
@@ -213,18 +216,51 @@ input, textarea, button, select, code, pre {
 }
 .dashboard-zone {
   flex: 1;
-  display: grid;
-  gap: 1px;
-  background: var(--border);
+  display: flex;
   overflow: hidden;
   min-width: 0;
 }
 
 /* AI-driven 60/40 layout */
 .dashboard-zone--ai {
-  display: flex;
   flex-direction: column;
-  gap: 1px;
+}
+
+/* ─── Resizable split handle ──────────────────────────────────────────────── */
+/* All handles are inline flex children — 1px visible line + ::before grab zone */
+.dash-resize-handle--inline {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 20;
+}
+.dash-resize-handle--inline.dash-resize-handle--y {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  cursor: row-resize;
+}
+.dash-resize-handle--inline.dash-resize-handle--y::before {
+  content: '';
+  position: absolute;
+  top: -4px; bottom: -4px; left: 0; right: 0;
+  cursor: row-resize;
+}
+.dash-resize-handle--inline.dash-resize-handle--x {
+  width: 1px;
+  height: 100%;
+  background: var(--border);
+  cursor: col-resize;
+}
+.dash-resize-handle--inline.dash-resize-handle--x::before {
+  content: '';
+  position: absolute;
+  left: -4px; right: -4px; top: 0; bottom: 0;
+  cursor: col-resize;
+}
+.dash-resize-handle--inline:hover,
+.dash-resize-handle--inline:active {
+  background: var(--accent-blue);
+  opacity: 0.6;
 }
 
 .dash-slot {
@@ -500,20 +536,54 @@ input, textarea, button, select, code, pre {
 
 /* ─── Chat sidebar ───────────────────────────────────────────────────────────── */
 .chat-sidebar {
-  width: 360px;
+  position: relative;
   flex-shrink: 0;
   background: var(--bg-surface);
   overflow: hidden;
   transition: width 200ms ease;
 }
 
+/* Kill transition while user is actively dragging to resize */
+.chat-sidebar[data-resizing] {
+  transition: none !important;
+}
+
 .chat-sidebar[data-open='false'] {
-  width: 0;
+  width: 0 !important;
+}
+
+/* The handle IS the border — ::after renders the 1px line permanently,
+   turns accent-blue on hover. Zero gap between border and drag zone. */
+.chat-sidebar__resize-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  z-index: 10;
+  background: transparent;
+}
+.chat-sidebar__resize-handle::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+  transition: background 150ms, width 150ms;
+}
+.chat-sidebar__resize-handle:hover::after,
+.chat-sidebar__resize-handle:active::after {
+  width: 2px;
+  background: var(--accent-blue);
+  opacity: 0.6;
 }
 
 .chat-sidebar__inner {
-  width: 360px;
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1672,6 +1742,60 @@ input, textarea, button, select, code, pre {
   text-transform: uppercase;
   text-shadow: 0 0 24px currentColor;
 }
+
+/* ─── Radar overlay (thinking/streaming indicator) ──────────────────────────── */
+@keyframes radar-pulse {
+  0%   { transform: translate(-50%, -50%) scale(0.2); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(4);   opacity: 0;   }
+}
+
+.radar-overlay {
+  position: fixed;
+  /* Centered in workspace, offset for sidebar — close enough as a fixed point */
+  top: 50%;
+  left: calc(50% - 180px); /* approximate sidebar offset */
+  pointer-events: none;
+  z-index: 200;
+}
+
+.radar-core {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radar-label {
+  position: relative;
+  z-index: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  color: var(--accent-green);
+  text-shadow: 0 0 12px var(--accent-green);
+  opacity: 0.9;
+  animation: radar-label-pulse 2s ease-in-out infinite;
+}
+
+@keyframes radar-label-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1;   }
+}
+
+.radar-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--accent-green);
+  border-radius: 50%;
+  animation: radar-pulse 2.4s linear infinite;
+}
+.radar-ring--1 { animation-delay: 0s;    }
+.radar-ring--2 { animation-delay: 0.8s;  }
+.radar-ring--3 { animation-delay: 1.6s;  }
 
 /* ─── msg-input-meta file badge ──────────────────────────────────────────────── */
 .msg-input-meta__file {

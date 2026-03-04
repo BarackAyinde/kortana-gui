@@ -13,20 +13,45 @@ function formatTime(d: Date): string {
 
 export default function TopBar() {
   const { sidebarOpen, toggleSidebar } = useUIStore()
-  const { canvasMode, activePreset, setActivePreset } = useWindowManagerStore()
+  const { canvasMode, activePreset, currentLayout, setActivePreset, toggleCanvasMode } = useWindowManagerStore()
   const status = useConnectionStore((s) => s.status)
   const [time, setTime] = useState(() => formatTime(new Date()))
 
-  // Start polling the context store
   useConnection()
 
-  // Tick the clock every second
   useEffect(() => {
     const interval = setInterval(() => setTime(formatTime(new Date())), 1000)
     return () => clearInterval(interval)
   }, [])
 
-  const presetIdx = LAYOUT_PRESETS.findIndex((p) => p.id === activePreset?.id)
+  // Build the combined nav: "KORTANA" entry (if AI layout exists) + all presets
+  const hasKortanaView = currentLayout !== null
+  const navItems = hasKortanaView
+    ? [{ id: '__kortana__', label: 'KORTANA' }, ...LAYOUT_PRESETS]
+    : [...LAYOUT_PRESETS]
+
+  // Current position in navItems
+  const navIdx = hasKortanaView && !activePreset
+    ? 0
+    : navItems.findIndex((item) => item.id === activePreset?.id)
+
+  const goBack = () => {
+    if (navIdx <= 0) return
+    const prev = navItems[navIdx - 1]!
+    if (prev.id === '__kortana__') {
+      setActivePreset(null) // go back to AI layout
+    } else {
+      setActivePreset(LAYOUT_PRESETS.find((p) => p.id === prev.id)!)
+    }
+  }
+
+  const goForward = () => {
+    if (navIdx >= navItems.length - 1) return
+    const next = navItems[navIdx + 1]!
+    setActivePreset(LAYOUT_PRESETS.find((p) => p.id === next.id)!)
+  }
+
+  const showNav = canvasMode === 'dashboard' && navItems.length > 1
 
   return (
     <header className="top-bar">
@@ -35,22 +60,26 @@ export default function TopBar() {
         <Badge
           label={canvasMode === 'free' ? 'CANVAS' : 'DASHBOARD'}
           variant={canvasMode === 'dashboard' ? 'active' : 'dim'}
+          onClick={toggleCanvasMode}
+          title="Toggle dashboard / free mode (⌘⇧K)"
         />
-        {canvasMode === 'dashboard' && activePreset && (
+        {showNav && (
           <>
             <button
               className="icon-btn"
-              onClick={() => setActivePreset(LAYOUT_PRESETS[presetIdx - 1])}
-              disabled={presetIdx <= 0}
+              onClick={goBack}
+              disabled={navIdx <= 0}
               title="Previous layout"
             >
               ◂
             </button>
-            <span key={activePreset.id} className="top-bar__layout-name">{activePreset.label}</span>
+            <span key={navItems[navIdx]?.id} className="top-bar__layout-name">
+              {navItems[navIdx]?.label ?? ''}
+            </span>
             <button
               className="icon-btn"
-              onClick={() => setActivePreset(LAYOUT_PRESETS[presetIdx + 1])}
-              disabled={presetIdx >= LAYOUT_PRESETS.length - 1}
+              onClick={goForward}
+              disabled={navIdx >= navItems.length - 1}
               title="Next layout"
             >
               ▸
@@ -63,12 +92,12 @@ export default function TopBar() {
         <StatusDot status={status} />
         <span className="top-bar__timestamp">{time}</span>
         <button
-          className="icon-btn"
+          className="icon-btn top-bar__sidebar-toggle"
           onClick={toggleSidebar}
           title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
           aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
         >
-          {sidebarOpen ? '›' : '‹'}
+          {sidebarOpen ? '⊣' : '⊢'}
         </button>
       </div>
     </header>
