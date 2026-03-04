@@ -26,7 +26,7 @@ export default function CanvasZone() {
       {panels.length === 0 && (
         <div className="canvas-zone__empty">
           <span className="canvas-zone__hint">⌘K · spawn panel</span>
-          <span className="canvas-zone__hint">⌘⇧K · toggle dashboard / free</span>
+          <span className="canvas-zone__hint">⌘⇧K · toggle dashboard/canvas</span>
         </div>
       )}
 

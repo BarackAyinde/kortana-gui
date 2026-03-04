@@ -33,7 +33,7 @@ export default function TopBar() {
       <div className="top-bar__left">
         <span className="top-bar__wordmark">KORTANA</span>
         <Badge
-          label={canvasMode === 'free' ? 'FREE' : 'DASHBOARD'}
+          label={canvasMode === 'free' ? 'CANVAS' : 'DASHBOARD'}
           variant={canvasMode === 'dashboard' ? 'active' : 'dim'}
         />
         {canvasMode === 'dashboard' && activePreset && (
