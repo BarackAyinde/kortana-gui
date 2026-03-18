@@ -4,6 +4,8 @@ import { streamMessage, buildSystemPrompt } from '../lib/kortanaApi'
 import { getContextSnapshot } from '../lib/contextCache'
 import { parseLayoutDirective } from '../lib/parseLayoutDirective'
 import { useWindowManagerStore } from '../store/windowManagerStore'
+import { setPendingDiff } from '../panels/CodeEditorPanel'
+import { postWorkflow } from '../lib/postWorkflow'
 import { useSettingsStore } from '../store/settingsStore'
 import { useVoiceStore } from '../store/voiceStore'
 import { KORTANA_TOOLS } from '../lib/toolRegistry'
@@ -99,9 +101,17 @@ export default function MessageInput() {
         // Parse layout directive from completed assistant message
         const lastMsg = useChatStore.getState().messages.at(-1)
         if (lastMsg?.role === 'assistant') {
-          const { directive, cleanContent } = parseLayoutDirective(lastMsg.content)
+          const { directive, diffPayload, workflowPayload, cleanContent } = parseLayoutDirective(lastMsg.content)
           if (directive) {
             useWindowManagerStore.getState().applyLayoutDirective(directive)
+          }
+          if (diffPayload) {
+            setPendingDiff(diffPayload)
+          }
+          if (workflowPayload) {
+            postWorkflow(workflowPayload).then((workflowId) => {
+              window.dispatchEvent(new CustomEvent('kortana:open-workflow', { detail: { workflowId } }))
+            }).catch(() => {/* store offline */})
           }
           if (cleanContent !== lastMsg.content) {
             patchLast(cleanContent)

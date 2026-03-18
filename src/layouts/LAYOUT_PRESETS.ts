@@ -25,6 +25,15 @@ import type { LayoutPreset } from '../types'
 
 export const LAYOUT_PRESETS: LayoutPreset[] = [
   {
+    id: 'architecture',
+    label: 'ARCHITECTURE',
+    gridTemplate: '',
+    gridCols: '',
+    gridRows: '',
+    slots: [],
+    standalone: true,
+  },
+  {
     id: 'intelligence',
     label: 'INTELLIGENCE',
     gridTemplate: '"context map"',
@@ -36,8 +45,8 @@ export const LAYOUT_PRESETS: LayoutPreset[] = [
     ],
   },
   {
-    id: 'analysis',
-    label: 'ANALYSIS',
+    id: 'engineering',
+    label: 'ENGINEERING',
     gridTemplate: '"context delta" "context log"',
     gridCols: '2fr 1fr',
     gridRows: '1fr 1fr',

@@ -18,14 +18,15 @@ export default function App() {
       if (!(e.metaKey || e.ctrlKey)) return
       if (e.code !== 'KeyK') return
       e.preventDefault()
-      if (e.shiftKey) {
+      e.stopImmediatePropagation()
+      if (e.altKey) {
         useWindowManagerStore.getState().toggleCanvasMode()
-      } else if (useWindowManagerStore.getState().canvasMode === 'free') {
+      } else {
         useUIStore.getState().togglePalette()
       }
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
   }, [])
 
   return (

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useWindowManagerStore } from '../store/windowManagerStore'
 import { PANEL_REGISTRY } from '../panels/PANEL_REGISTRY'
 import type { LayoutDirective, LayoutPreset, PanelType } from '../types'
+import ArchitectureDashboard from '../panels/ArchitectureDashboard/ArchitectureDashboard'
 
 const FALLBACK_LAYOUT: LayoutDirective = {
   focus: 'map',
@@ -60,7 +61,7 @@ type StructE = { type: 'E'; top: string; bottomLeft: string; bottomMid: string; 
 
 const PRESET_STRUCTURES: Record<string, StructA | StructB | StructE> = {
   intelligence: { type: 'A', left: 'context', right: 'map' },
-  analysis:     { type: 'B', left: 'context', topRight: 'delta', bottomRight: 'log' },
+  engineering:  { type: 'B', left: 'context', topRight: 'delta', bottomRight: 'log' },
   trading:      { type: 'E', top: 'trading', bottomLeft: 'signal-intel', bottomMid: 'trade-engine', bottomRight: 'strategy-monitor' },
 }
 
@@ -380,6 +381,11 @@ function AIDashboard({ layout }: { layout: LayoutDirective }) {
 export default function DashboardZone() {
   const activePreset = useWindowManagerStore((s) => s.activePreset)
   const currentLayout = useWindowManagerStore((s) => s.currentLayout)
+
+  // Standalone dashboards replace the entire zone with their own layout
+  if (activePreset?.standalone) {
+    if (activePreset.id === 'architecture') return <ArchitectureDashboard />
+  }
 
   if (activePreset) return <PresetDashboard preset={activePreset} />
   return <AIDashboard layout={currentLayout ?? FALLBACK_LAYOUT} />

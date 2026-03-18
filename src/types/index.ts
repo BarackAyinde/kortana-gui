@@ -11,6 +11,7 @@ export type PanelType =
   | 'signal-intel'
   | 'strategy-monitor'
   | 'trade-engine'
+  | 'workflow'
 
 export interface PanelInstance {
   id: string
@@ -37,6 +38,8 @@ export interface LayoutPreset {
     panelType: PanelType
     defaultProps?: Record<string, unknown>
   }[]
+  /** When true, DashboardZone renders a standalone dashboard component instead of panel grid */
+  standalone?: boolean
 }
 
 export interface LayoutDirective {

@@ -37,7 +37,7 @@ export default function CanvasZone() {
 
       <div className="canvas-zone__keyhints">
         <span>⌘K · spawn panel</span>
-        <span>⌘⇧K · dashboard</span>
+        <span>⌘⌥K · dashboard</span>
       </div>
     </div>
   )

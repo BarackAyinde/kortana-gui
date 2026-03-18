@@ -81,7 +81,7 @@ export default function TopBar() {
           label={canvasMode === 'free' ? 'CANVAS' : 'DASHBOARD'}
           variant={canvasMode === 'dashboard' ? 'active' : 'dim'}
           onClick={toggleCanvasMode}
-          title="Toggle dashboard / free mode (⌘⇧K)"
+          title="Toggle dashboard / free mode (⌘⌥K)"
         />
         {showNav && (
           <>
